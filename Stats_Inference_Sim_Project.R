@@ -9,10 +9,10 @@ Num_Sample <- 40
 # 1000 simulations
 Num_Sim <- 1000
 
-# simulate
+# simulate 1000 instances of 40 exponentials
 Sim_Exp <- replicate(Num_Sim, rexp(Num_Sample, lambda))
 
-# calculate mean & variance of the sample of exponentials
+# calculate mean of the sample of exponentials
 mean_Sim_Exp <- apply(Sim_Exp, 2, mean)
 
 # calculate the mean of the sample mean
@@ -62,3 +62,6 @@ lines(xfit, yfit, pch=22, col="orange", lty=2)
 legend('topright', c("Simulation distribution", "Theoretical distribution"),
        lty=c(1,2), col=c("blue", "orange"))
 
+# compare the distribution of 1000 means (simulation) of 40 exponentials to a normal distribution
+qqnorm(mean_Sim_Exp)
+qqline(mean_Sim_Exp, col = 2)
