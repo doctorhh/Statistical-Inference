@@ -2,7 +2,7 @@
 title: "Statistical Inference - Simulation project"
 author: "H.Harvey"
 date: "25 December 2015"
-output: pdf_document
+output: html_document
 ---
 ```{r setoption, echo=FALSE}
 library(knitr)

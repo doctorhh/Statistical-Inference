@@ -12,25 +12,15 @@ opts_chunk$set(echo = TRUE)
 ## Introduction
 The purpose of this project is to perform basic exploratory and inferential data analysis using the ToothGrowth data in the R datasets package. 
 
-This project should cover the following task:
-
-- perform some basic exploratory data analyses
-- provide a basic summary of the data.
-- use confidence intervals and hypothesis tests to compare tooth growth by supp and dose.
-- state your conclusions and the assumptions needed for your conclusions
-
 ## Setting the environment
 ```{r}
-library(dplyr)
+library(dplyr) 
 library(ggplot2)
 data(ToothGrowth)
 ```
 ## Data structure:
 A data frame with 60 observations on 3 variables.
-
-- [,1] "len" numeric Tooth length
-- [,2] "supp" factor Supplement type (VC-Vitamin C or OJ-Orange Juice).
-- [,3] "dose" numeric Dose in milligrams/day (0.5 / 1.0 / 2.0)
+"len" numeric Tooth length / "supp" factor Supplement type (VC-Vitamin C or OJ-Orange Juice) / "dose" numeric Dose in milligrams/day (0.5 / 1.0 / 2.0)
 
 ## Initial data exploration
 ```{r}
@@ -50,13 +40,7 @@ table(ToothGrowth$supp,ToothGrowth$dose)
 
 The dataset is split equally within the supplement type (30 observations each) and dose (10 observations each). For each supplement type, and a given dose, 10 subjects received Orange Juice and another received Vitamin C.
 
-## Data Visualization
-```{r}
-# Visualzating the variable interaction between lenght and dose/supplement # type
-interaction.plot(ToothGrowth$dose, ToothGrowth$supp, ToothGrowth$len)
-```
-
-```{r}
+```{r,fig.width=5,fig.height=4}
 q <- ggplot(ToothGrowth,aes(factor(dose),len)) +
       geom_boxplot(aes(fill=dose)) + facet_grid(.~supp)
 print(q)
