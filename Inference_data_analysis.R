@@ -16,11 +16,13 @@ q <- ggplot(ToothGrowth,aes(factor(dose),len)) +
       geom_boxplot(aes(fill=dose)) + facet_grid(.~supp)
 print(q)
 
+# Calculating the mean by supplement type and doses for t.test reference
 stats_df <-ToothGrowth %>%
       group_by(supp,dose) %>%
       summarise(mean_Len = mean(len), stddev_Len = sd(len), n = n())
-
+# Calculating the mean by dose
 stats_df %>% group_by(dose) %>% summarise(mean_d=mean(mean_Len))
+# Calculating the mean by supplement type
 stats_df %>% group_by(supp) %>% summarise(mean_d=mean(mean_Len))
 
 #T.Test of supplement type

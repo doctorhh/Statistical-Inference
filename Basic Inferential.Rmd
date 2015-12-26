@@ -1,0 +1,112 @@
+---
+title: "Statistical Inference - Basic Inferential Data Analysis"
+author: "H.Harvey"
+date: "25 December 2015"
+output: html_document
+---
+```{r setoption, echo=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+The purpose of this project is to perform basic exploratory and inferential data analysis using the ToothGrowth data in the R datasets package. 
+
+This project should cover the following task:
+
+- perform some basic exploratory data analyses
+- provide a basic summary of the data.
+- use confidence intervals and hypothesis tests to compare tooth growth by supp and dose.
+- state your conclusions and the assumptions needed for your conclusions
+
+## Setting the environment
+```{r}
+library(dplyr)
+library(ggplot2)
+data(ToothGrowth)
+```
+## Data structure:
+A data frame with 60 observations on 3 variables.
+
+- [,1] "len" numeric Tooth length
+- [,2] "supp" factor Supplement type (VC-Vitamin C or OJ-Orange Juice).
+- [,3] "dose" numeric Dose in milligrams/day (0.5 / 1.0 / 2.0)
+
+## Initial data exploration
+```{r}
+# Looking at the dataset
+str(ToothGrowth)
+# Validating the structure
+head(ToothGrowth)
+#  Validating the number of rows
+nrow(ToothGrowth)
+# Getting a statistical summary of the variables
+summary(ToothGrowth)
+# Checking that no missing data exist
+sum(is.na(ToothGrowth))
+# Representing the numbers of case per dose & supplement type to validation # the distribution of cases.
+table(ToothGrowth$supp,ToothGrowth$dose)
+```
+
+The dataset is split equally within the supplement type (30 observations each) and dose (10 observations each). For each supplement type, and a given dose, 10 subjects received Orange Juice and another received Vitamin C.
+
+## Data Visualization
+```{r}
+# Visualzating the variable interaction between lenght and dose/supplement # type
+interaction.plot(ToothGrowth$dose, ToothGrowth$supp, ToothGrowth$len)
+```
+
+```{r}
+q <- ggplot(ToothGrowth,aes(factor(dose),len)) +
+      geom_boxplot(aes(fill=dose)) + facet_grid(.~supp)
+print(q)
+```
+
+From the above graph, Orange Juice in doses of 0.5 and 1.0mg seems to support tooth growth over Vitamin C. However, at higher dosage (2.0mg), there doesn't seems to be one supplement better than the other.
+
+## Hypotheses
+**Null Hypothesis (H0):** Orange Juice and Vitamin C have the same effect on tooth growth.
+
+**Alternative Hypothesis (Ha):** Orange Juice and Vitamin C do not have the same effect on tooth growth.
+
+A p-value of 0.05 or 5% was used to determine whether the null hypothesis (H0) is rejected or not. If p<0.05, the (H0) was  rejected.
+
+## Data preparation
+```{r}
+# Calculating the mean by supplement type and doses for t.test reference
+stats_df <-ToothGrowth %>%
+      group_by(supp,dose) %>%
+      summarise(mean_Len = mean(len), stddev_Len = sd(len), n = n())
+# Calculating the mean by dose
+stats_df %>% group_by(dose) %>% summarise(mean_d=mean(mean_Len))
+# Calculating the mean by supplement type
+stats_df %>% group_by(supp) %>% summarise(mean_d=mean(mean_Len))
+```
+
+## Hypotheses calculation
+```{r}
+# t.test of by dose & supplement type
+t_d0 <- ToothGrowth %>% filter(dose == 0.5)
+t_d1 <- ToothGrowth %>% filter(dose == 1)
+t_d2 <- ToothGrowth %>% filter(dose == 2)
+
+# Assessing Orange Juice over Vitamin C (variable order)
+t.test(filter(t_d0,supp=="OJ")$len,filter(t_d0,supp=="VC")$len ,paired = FALSE, var.equal = TRUE)
+t.test(filter(t_d1,supp=="OJ")$len,filter(t_d1,supp=="VC")$len ,paired = FALSE, var.equal = TRUE)
+t.test(filter(t_d2,supp=="OJ")$len,filter(t_d2,supp=="VC")$len ,paired = FALSE, var.equal = TRUE)
+```
+
+Orange Juice vs Vitamin C:
+
+- dose: 0.5 ->  lwr(1.770)   upper(8.730)   p-value(0.00530)
+- dose: 1.0 ->  lwr(2.841)   upper(9.019)   p-value(0.0008)
+- dose: 2.0 ->  lwr(-3.723)  upper(3.563)   p-value(0.964)
+
+The p-value of the 0.5 and 1.0 dosages demonstrate that there is a difference in the tooth growth for each supplement type. However, at 2.0mg dosage,the p-value doesn't allow one to claim that a differene exist, or is not due to chance.
+
+The confidence interval of the 0.5 and 1.0 dosages indicate that the Orange Juice supplement is more effective than the Vitamin C (positive interval). However, at higher dosage (2.0mg), the effect between supplement type seems to be equivalent due to the symmetrical value of the interval.
+
+## Conclusion
+The results of both the null hypothesis tests and confidence intervals demonstrate that doses of 0.5 and 1.0mg of Orange Juice is more effective in tooth growth. However, at higher dosage,2.0mg, neither supplement type is more effective.
+
+Finally, it can be concluded that tooth growth increase with doses.
